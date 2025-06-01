@@ -1,3 +1,4 @@
+
 const BASE_URL = 'https://zaidawn.site/wp-json/ims/v1';
 
 // API response types
@@ -174,7 +175,20 @@ export const productsApi = {
   
   getById: (id: number) => apiRequest<ApiResponse<any>>(`/products/${id}`),
   
-  create: (product: any) => 
+  create: (product: {
+    name: string;
+    description?: string;
+    sku: string;
+    category: string;
+    price: number;
+    costPrice: number;
+    stock: number;
+    minStock: number;
+    maxStock: number;
+    unit: string;
+    supplierId?: number;
+    images?: string[];
+  }) => 
     apiRequest<ApiResponse<any>>('/products', {
       method: 'POST',
       body: JSON.stringify(product),

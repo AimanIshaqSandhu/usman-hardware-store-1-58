@@ -1,7 +1,7 @@
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -15,34 +15,27 @@ export const Login = () => {
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handlePinSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate authentication delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    if (pin === CORRECT_PIN) {
-      login();
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "Invalid pin code. Please try again.",
-        variant: "destructive"
-      });
-      setPin('');
-    }
-    setIsLoading(false);
-  };
-
-  const handlePinChange = (value: string) => {
+  const handlePinChange = async (value: string) => {
     setPin(value);
+    
+    // Auto-submit when pin is complete
     if (value.length === 8) {
-      // Auto-submit when pin is complete
-      setTimeout(() => {
-        const form = document.getElementById('pin-form') as HTMLFormElement;
-        form?.requestSubmit();
-      }, 300);
+      setIsLoading(true);
+      
+      // Simulate authentication delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      if (value === CORRECT_PIN) {
+        login();
+      } else {
+        toast({
+          title: "Access Denied",
+          description: "Invalid pin code. Please try again.",
+          variant: "destructive"
+        });
+        setPin('');
+      }
+      setIsLoading(false);
     }
   };
 
@@ -74,61 +67,51 @@ export const Login = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <form id="pin-form" onSubmit={handlePinSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
-                  Pin Code
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setShowPin(!showPin)}
-                  className="text-slate-400 hover:text-slate-300 transition-colors"
-                >
-                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              
-              <div className="flex justify-center">
-                <InputOTP
-                  maxLength={8}
-                  value={pin}
-                  onChange={handlePinChange}
-                  disabled={isLoading}
-                >
-                  <InputOTPGroup>
-                    {Array.from({ length: 8 }).map((_, index) => (
-                      <InputOTPSlot
-                        key={index}
-                        index={index}
-                        className={`
-                          w-12 h-12 text-lg font-mono border-slate-600 bg-slate-800/50 text-white
-                          focus:border-purple-500 focus:ring-purple-500/20
-                          ${showPin ? '' : '[&>*]:text-transparent [&>*]:after:content-["•"] [&>*]:after:text-white'}
-                        `}
-                      />
-                    ))}
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Pin Code
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPin(!showPin)}
+                className="text-slate-400 hover:text-slate-300 transition-colors"
+              >
+                {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
+            
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={8}
+                value={pin}
+                onChange={handlePinChange}
+                disabled={isLoading}
+              >
+                <InputOTPGroup>
+                  {Array.from({ length: 8 }).map((_, index) => (
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                      className={`
+                        w-12 h-12 text-lg font-mono border-slate-600 bg-slate-800/50 text-white
+                        focus:border-purple-500 focus:ring-purple-500/20
+                        ${showPin ? '' : '[&>*]:text-transparent [&>*]:after:content-["•"] [&>*]:after:text-white'}
+                      `}
+                    />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+          </div>
 
-            <Button
-              type="submit"
-              disabled={pin.length !== 8 || isLoading}
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Authenticating...
-                </div>
-              ) : (
-                'Access System'
-              )}
-            </Button>
-          </form>
+          {isLoading && (
+            <div className="flex items-center justify-center gap-2 text-slate-300">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              Authenticating...
+            </div>
+          )}
 
           <div className="text-center">
             <p className="text-xs text-slate-500">
