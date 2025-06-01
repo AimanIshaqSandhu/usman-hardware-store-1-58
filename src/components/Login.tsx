@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, Shield, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const CORRECT_PIN = '12345678';
 
@@ -13,7 +12,7 @@ export const Login = () => {
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPin, setShowPin] = useState(false);
-  const { checkAuth } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
 
   const handlePinSubmit = async (e: React.FormEvent) => {
@@ -24,12 +23,7 @@ export const Login = () => {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     if (pin === CORRECT_PIN) {
-      localStorage.setItem('jwt_token', 'authenticated');
-      checkAuth();
-      toast({
-        title: "Welcome back!",
-        description: "Successfully authenticated",
-      });
+      login();
     } else {
       toast({
         title: "Access Denied",

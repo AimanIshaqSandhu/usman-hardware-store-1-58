@@ -36,6 +36,15 @@ export const useAuth = () => {
     setLoading(false);
   };
 
+  const login = () => {
+    localStorage.setItem('jwt_token', 'authenticated');
+    setIsAuthenticated(true);
+    toast({
+      title: "Welcome back!",
+      description: "Successfully authenticated",
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem('jwt_token');
     setIsAuthenticated(false);
@@ -48,6 +57,7 @@ export const useAuth = () => {
   return {
     isAuthenticated,
     loading,
+    login,
     logout,
     checkAuth
   };
